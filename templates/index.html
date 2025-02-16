@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Breast Cancer Ultrasound Classification</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Breast Cancer Ultrasound Classification</h1>
+    <input type="file" id="imageInput" accept="image/*">
+    <br>
+    <img id="preview" src="" alt="Image Preview" style="display: none;">
+    <br>
+    <button id="predictBtn">Predict</button>
+    <div id="loading" style="display: none;">Processing...</div>
+    <div id="result"></div>
+    <button id="explainBtn" style="display: none;">Show Grad-CAM & LIME Explanation</button>
+    <div id="explanation" style="display: none;">
+      <h3>Grad-CAM</h3>
+      <img id="gradcam" src="">
+      <h3>LIME Explanation</h3>
+      <img id="lime" src="">
+    </div>
+  </div>
+
+  <script>
+    const imageInput = document.getElementById("imageInput");
+    const preview = document.getElementById("preview");
+    const predictBtn = document.getElementById("predictBtn");
+    const loading = document.getElementById("loading");
+    const resultDiv = document.getElementById("result");
+    const explainBtn = document.getElementById("explainBtn");
+    const explanationDiv = document.getElementById("explanation");
+    const gradcamImg = document.getElementById("gradcam");
+    const limeImg = document.getElementById("lime");
+
+    let uploadedImageB64 = "";
+
+    imageInput.addEventListener("change", function() {
+      const file = this.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          preview.src = e.target.result;
+          preview.style.display = "block";
+          uploadedImageB64 = e.target.result.split(",")[1]; // remove data URL header
+        }
+        reader.readAsDataURL(file);
+      }
+    });
+
+    predictBtn.addEventListener("click", function() {
+      if (!uploadedImageB64) {
+        alert("Please upload an image first.");
+        return;
+      }
+      resultDiv.innerHTML = "";
+      explainBtn.style.display = "none";
+      explanationDiv.style.display = "none";
+      loading.style.display = "block";
+
+      // Create a form data object with the file
+      const fileInput = document.getElementById("imageInput");
+      const formData = new FormData();
+      formData.append("file", fileInput.files[0]);
+
+      fetch("/predict", {
+        method: "POST",
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        loading.style.display = "none";
+        if(data.error){
+          resultDiv.innerHTML = `<p style="color:red;">${data.error}</p>`;
+        } else {
+          resultDiv.innerHTML = `<p>Prediction: <strong>${data.predicted_label}</strong> (Confidence: ${(data.confidence * 100).toFixed(2)}%)</p>
+                                 <p>Processing Time: ${data.process_time.toFixed(2)} sec</p>`;
+          // Store the base64 image returned from the server for explanation.
+          uploadedImageB64 = data.image_base64;
+          explainBtn.style.display = "inline-block";
+        }
+      })
+      .catch(error => {
+        loading.style.display = "none";
+        resultDiv.innerHTML = `<p style="color:red;">Error: ${error}</p>`;
+      });
+    });
+
+    explainBtn.addEventListener("click", function() {
+      loading.style.display = "block";
+      fetch("/explain", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ image_base64: uploadedImageB64 })
+      })
+      .then(response => response.json())
+      .then(data => {
+        loading.style.display = "none";
+        explanationDiv.style.display = "block";
+        gradcamImg.src = "data:image/jpeg;base64," + data.gradcam;
+        limeImg.src = "data:image/jpeg;base64," + data.lime;
+      })
+      .catch(error => {
+        loading.style.display = "none";
+        alert("Error generating explanations: " + error);
+      });
+    });
+  </script>
+</body>
+</html>
