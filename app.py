@@ -6,7 +6,7 @@ import numpy as np
 import cv2
 from PIL import Image
 from flask import Flask, request, jsonify, render_template
-
+os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 import tensorflow as tf
 from tensorflow.keras import layers
 from tensorflow.keras.models import load_model
