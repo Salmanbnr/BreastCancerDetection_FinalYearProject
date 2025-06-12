@@ -1,60 +1,63 @@
+/*statisc/css/style.css*/
 body {
-  background-color: #f4f4f4;
-  font-family: Arial, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   margin: 0;
-  padding: 0;
+  padding: 40px;
+  background-color: #f0f2f5;
 }
 
 .container {
-  width: 80%;
-  max-width: 800px;
-  margin: 50px auto;
-  text-align: center;
-  background: #fff;
+  max-width: 900px;
+  margin: auto;
+  background-color: #fff;
   padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
 }
 
-h1 {
+h1, h2, h3 {
+  text-align: center;
   color: #333;
 }
 
 input[type="file"] {
-  margin: 20px;
+  display: block;
+  margin: 20px auto;
 }
 
 button {
+  display: block;
+  margin: 10px auto 30px;
   padding: 10px 20px;
-  margin: 10px;
-  background-color: #007bff;
-  color: white;
+  font-size: 16px;
+  background-color: #0050b3;
+  color: #fff;
   border: none;
+  border-radius: 6px;
   cursor: pointer;
-  border-radius: 5px;
-  font-size: 1em;
+  transition: background-color 0.3s ease;
 }
 
 button:hover {
-  background-color: #0056b3;
+  background-color: #003a8c;
 }
 
-#result {
-  font-size: 1.2em;
-  margin: 20px;
-  color: #333;
+#result, #explanations {
+  margin-top: 30px;
+  text-align: center;
 }
 
-img {
-  max-width: 100%;
-  height: auto;
-  margin: 10px;
-  border: 2px solid #ddd;
-  border-radius: 5px;
+#result img, #explanations img {
+  max-width: 300px;
+  margin: 10px auto;
+  display: block;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 5px;
+  background-color: #fafafa;
 }
 
-#loading {
-  font-size: 1.2em;
-  color: #007bff;
-  margin: 20px;
+#explanations > div {
+  margin-top: 20px;
+  padding: 10px;
 }
